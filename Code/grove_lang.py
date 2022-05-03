@@ -32,10 +32,13 @@ class Addition(Expr):
     def __init__(self, child1, child2):
         self.child1 = child1
         self.child2 = child2
+        if(type(self.child1) != type(self.child2)):
+            raise GroveError("Types do not match")
+        
         if not isinstance(self.child1, Expr):
-            raise ValueError("Grove: expected expression but recieved " + str(type(self.child1)))
+            raise GroveError("Expected expression but recieved " + str(type(self.child1)))
         if not isinstance(self.child2, Expr):
-            raise ValueError("Grove: expected expression but recieved " + str(type(self.child2)))
+            raise GroveError("Expected expression but recieved " + str(type(self.child2)))
     def eval(self):
         return self.child1.eval() + self.child2.eval()
         

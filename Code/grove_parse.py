@@ -1,11 +1,12 @@
 #exec(open("Grove_lang.py").read())
+from tokenize import Double
 from grove_lang import *
  
 # Utility methods for handling parse errors
 def check(condition, message = "Unexpected end of expression"):
     """ Checks if condition is true, raising a ValueError otherwise """
     if not condition:
-        raise ValueError("Grove: " + message)
+        raise GroveError(message)
         
 def expect(token, expected):
     """ Checks that token matches expected
@@ -24,6 +25,14 @@ def is_int(s):
     except ValueError:
         return False
 
+def is_double(s):
+    try:
+        isinstance(s, (Double, float))
+        return True
+    except ValueError:
+        return False  
+    
+    
 def is_string(s):
     for c in s:
         if c == ' ':
