@@ -1,5 +1,7 @@
 #exec(open("Grove_lang.py").read())
+from unicodedata import name
 from grove_lang import *
+import re
  
 # Utility methods for handling parse errors
 def check(condition, message = "Unexpected end of expression"):
@@ -49,7 +51,9 @@ def parse_tokens(tokens):
         
     start = tokens[0]
     
-    if is_int(start):
+    if start=="exit" or start=="quit":
+        Quit()
+    elif is_int(start):
         return (Num(int(start)), tokens[1:])
     elif start in ["+"]:
         check(len(tokens)>0)
@@ -67,16 +71,21 @@ def parse_tokens(tokens):
         #     return ( Subtraction(child1, child2), tokens[1:] )
     elif start=="set":
         check(len(tokens)>0)
-        check(tokens[1].isalpha(), "Variable names must be alphabetic characters only")
+        # check(tokens[1].isalpha(), "Variable names must be alphabetic characters only")
+        check(re.match(r'^[A-Za-z0-9_]+$', tokens[1]), "Variable names must be alphanumeric characters underscores only")
         (varname, tokens) = parse_tokens(tokens[1:])
         check(len(tokens)>0)
         expect(tokens[0],"=")
         (child, tokens) = parse_tokens(tokens[1:])
         return (Stmt(varname, child), tokens)
- 
+    elif start=="import":
+        check(len(tokens)>0)
+        (modulename, tokens) = parse_tokens(tokens[1:])
+        print("module name: " + str(modulename.name))
+        return (Import(modulename.eval()), tokens)
     else:
-        check(start.isalpha(), "Variable names must be alphabetic characters only")
-        
+        # check(start.isalpha(), "Variable names must be alphabetic characters only")
+        check(re.match(r'^[A-Za-z0-9_]+$', start), "Variable names must be alphanumeric characters underscores only")
         return ( Name(start), tokens[1:] )
  
     
