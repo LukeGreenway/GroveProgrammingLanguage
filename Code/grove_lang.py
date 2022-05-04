@@ -96,11 +96,15 @@ class Object(Expr):
             class_name = self.objectname
             parts = class_name.split(".")
             container = globals()[parts[0]]
-            if isinstance(container, dict):
-                cls = container[parts[1]]
+            if len(parts) > 1:
+                if isinstance(container, dict):
+                    cls = container[parts[1]]
+                else:
+                    cls = getattr(container, parts[1])
+                obj = cls()
             else:
-                cls = getattr(container, parts[1])
-            return cls()
+                obj = globals()[parts[0]]()
+            return obj
         except Exception:
             raise GroveError("Invalid object")
 

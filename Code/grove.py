@@ -5,6 +5,7 @@
 # Our Grove interpreter is using a dynamic type system. Because our language isn't compiled, the type cannot be known at compile time.
 # Therefore, the type isn't known until runtime, and the user can use the same name to refer to different types at different points in the program.
 
+import traceback
 from grove_lang import *
 from grove_parse import *
 
@@ -18,4 +19,5 @@ if __name__ == "__main__":
                 print(res)
         except Exception as e:
             print("Error: " + str(e))
+            traceback.print_exc()
             pass
