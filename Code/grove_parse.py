@@ -1,20 +1,21 @@
+# Luke Greenway and Tirzah Lloyd
 #exec(open("Grove_lang.py").read())
-from ast import Pass
 import re
 from unicodedata import name
 from grove_lang import *
  
 # Utility methods for handling parse errors
 def check(condition, message = "Unexpected end of expression"):
-    """ Checks if condition is true, raising a ValueError otherwise """
+    """ Checks if condition is true, raising a GroveError otherwise """
     if not condition:
         raise GroveError(str(message))
         
 def expect(token, expected):
     """ Checks that token matches expected
-        If not, throws a ValueError with explanatory message """
+        If not, throws a GroveError with explanatory message """
     if token != expected:
         check(False, "Expected '" + expected + "' but found '" + token + "'")
+        
 def is_expr(x):
     if not isinstance(x, Expr):
         check(False, "Expected expression but found " + str(type(x)))        
@@ -43,7 +44,7 @@ def is_string(s):
        
 def parse(s):
     """ Return an object representing a parsed command
-        Throws ValueError for improper syntax """
+        Throws GroveError for improper syntax """
     (root, remaining_tokens) = parse_tokens(s.split())
     check(len(remaining_tokens)==0,
          "Expected end of command but found '" + " ".join(remaining_tokens) + "'")
@@ -90,7 +91,7 @@ def parse_tokens(tokens):
         (modulename, tokens) = parse_tokens(tokens[1:])
         return (Import(modulename.getName()), tokens) 
     elif start == "call":
-        check(len(tokens)>0)
+        check(len(tokens)>1)
         expect(tokens[1], "(")
         (object, tokens) = parse_tokens(tokens[2:])
         check(isinstance(object, Name))
@@ -101,6 +102,7 @@ def parse_tokens(tokens):
         args = []
         while(tokens[0] != ")"):
             (arg, tokens) = parse_tokens(tokens[0:])
+            check(isinstance(arg, Expr), "Expected expression, but received: " + str(type(arg)))
             args.append(arg)
             check(len(tokens)>0)
         return (Call(object, method, args), tokens[1:])        
@@ -108,6 +110,7 @@ def parse_tokens(tokens):
         check(len(tokens)>0)
         return (Object(tokens[1]), tokens[2:])
     else:
+        check(start[0].isalpha() or start[0] == "_", "Expect alphabetic or underscore for first char but got: " + str(start[0]))
         check(re.match(r'^[A-Za-z0-9_]+$', start), "Variable names must contain alphanumeric characters or underscores only")
         return ( Name(start), tokens[1:] )
 
