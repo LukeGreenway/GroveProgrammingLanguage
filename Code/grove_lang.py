@@ -1,6 +1,6 @@
-
 import importlib
 from statistics import multimode
+import sys
 
 
 class GroveError(Exception):
@@ -99,6 +99,10 @@ class SimpleAssignment(Stmt):
         
     def eval(self):
         var_table[self.varname.getName()] = self.expr.eval()
+
+class Quit():
+    def __init__(self):
+        sys.exit()
         
  
 # some testing code
