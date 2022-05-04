@@ -1,6 +1,7 @@
 
 import importlib
 from statistics import multimode
+import sys
 
 
 class GroveError(Exception):
@@ -88,6 +89,7 @@ class Import(Stmt):
         except Exception:
             raise GroveError("Invalid module name")
 
+
 class SimpleAssignment(Stmt):
     def __init__(self, varname,expr):
         self.varname = varname
@@ -99,7 +101,12 @@ class SimpleAssignment(Stmt):
         
     def eval(self):
         var_table[self.varname.getName()] = self.expr.eval()
+
+class Quit():
+    def __init__(self):
+        sys.exit()
         
+
  
 # some testing code
 # if __name__ == "__main__":
