@@ -1,13 +1,12 @@
-#exec(open("Grove_lang.py").read())
+import re
 from unicodedata import name
 from grove_lang import *
-import re
  
 # Utility methods for handling parse errors
 def check(condition, message = "Unexpected end of expression"):
     """ Checks if condition is true, raising a ValueError otherwise """
     if not condition:
-        raise ValueError("Grove: " + message)
+        raise GroveError(str(message))
         
 def expect(token, expected):
     """ Checks that token matches expected
@@ -25,12 +24,19 @@ def is_int(s):
         return True
     except ValueError:
         return False
-
+    
 def is_string(s):
+    if(s[0] != "\""):
+        return False
+    if(s[len(s)-1] != "\""):
+        return False
+    
     for c in s:
         if c == ' ':
             return False
-        
+        elif c == '\\':
+            return False
+    return True
         
        
 def parse(s):
@@ -56,6 +62,7 @@ def parse_tokens(tokens):
     elif is_int(start):
         return (Num(int(start)), tokens[1:])
     elif start in ["+"]:
+        #Addition can include strings as well
         check(len(tokens)>0)
         expect(tokens[1], "(")
         (child1, tokens) = parse_tokens(tokens[2:])
@@ -78,6 +85,8 @@ def parse_tokens(tokens):
         expect(tokens[0],"=")
         (child, tokens) = parse_tokens(tokens[1:])
         return (Stmt(varname, child), tokens)
+    elif is_string(start):
+        return (StringLiteral(start[1:-1]), tokens[1:])
     elif start=="import":
         check(len(tokens)>0)
         (modulename, tokens) = parse_tokens(tokens[1:])
