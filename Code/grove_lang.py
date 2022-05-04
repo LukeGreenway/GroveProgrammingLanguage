@@ -2,6 +2,7 @@
 import importlib
 from statistics import multimode
 import sys
+import traceback
 
 
 class GroveError(Exception):
@@ -114,8 +115,16 @@ class Call(Expr):
     def eval(self):
         try:
             f = getattr(self.object.eval(), self.method.getName())
+            newArgs = []
+            for arg in self.args:
+                if isinstance(arg, Expr):
+                    newArgs.append(arg.eval())
+                else: 
+                    newArgs.append(arg)
+            self.args = newArgs
             return f(*self.args)
         except Exception as e:
+            traceback.print_exc()
             raise GroveError(e)
 
  

@@ -104,8 +104,9 @@ def parse_tokens(tokens):
         check(len(tokens)>0)
         args = []
         while(tokens[0] != ")"):
-            (arg, tokens) = parse_tokens(tokens[1:])
+            (arg, tokens) = parse_tokens(tokens[0:])
             args.append(arg)
+            check(len(tokens)>0)
         return (Call(object, method, args), tokens[1:])
         
     else:
