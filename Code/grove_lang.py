@@ -1,6 +1,7 @@
 import importlib
 from statistics import multimode
 import sys
+import traceback
 
 
 class GroveError(Exception):
@@ -33,7 +34,7 @@ class Addition(Expr):
         self.child1 = child1
         self.child2 = child2
         if(type(self.child1.eval()) != type(self.child2.eval())):
-            raise GroveError("Types of " + str(self.child1) + " and " + str(self.child2) + " do not match")
+            raise GroveError("Types of " + str(type(self.child1)) + " and " + str(type(self.child2)) + " do not match")
         
         if not isinstance(self.child1, Expr):
             raise GroveError("Expected expression but recieved " + str(type(self.child1)))
@@ -88,6 +89,7 @@ class Import(Stmt):
         except Exception:
             raise GroveError("Invalid module name")
 
+
 class Object(Expr):
     def __init__(self,objectname):
         self.objectname = objectname
@@ -108,6 +110,7 @@ class Object(Expr):
         except Exception:
             raise GroveError("Invalid object")
 
+
 class SimpleAssignment(Stmt):
     def __init__(self, varname,expr):
         self.varname = varname
@@ -124,23 +127,23 @@ class Quit():
     def __init__(self):
         sys.exit()
         
+class Call(Expr):
+    def __init__(self, object, method, args):
+        self.object = object
+        self.method = method
+        self.args = args
+    def eval(self):
+        try:
+            f = getattr(self.object.eval(), self.method.getName())
+            newArgs = []
+            for arg in self.args:
+                if isinstance(arg, Expr):
+                    newArgs.append(arg.eval())
+                else: 
+                    newArgs.append(arg)
+            self.args = newArgs
+            return f(*self.args)
+        except Exception as e:
+            raise GroveError(e)
+
  
-# some testing code
-# if __name__ == "__main__":
-#     assert(Num(3).eval() == 3)
-#     assert(Addition(Num(3), Num(10)).eval() == 13)
-#     assert(Subtraction(Num(3), Num(10)).eval() == -7)
-    
-#     caught_error = False
-#     try:
-#         print(Name("nope").eval())
-#     except ValueError:
-#         caught_error = True
-#     assert(caught_error)
-    
-#     assert(Stmt(Name("foo"), Num(10)).eval() is None)
-#     assert(Name("foo").eval() == 10)
-    
-#     # Try something more complicated
-#     assert(Stmt(Name("foo"), Addition(Num(200), Subtraction(Num(4), Num(12)))).eval() is None)
-#     assert(Name("foo").eval() == 192)

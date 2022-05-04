@@ -1,3 +1,5 @@
+#exec(open("Grove_lang.py").read())
+from ast import Pass
 import re
 from unicodedata import name
 from grove_lang import *
@@ -56,8 +58,7 @@ def parse_tokens(tokens):
     check(len(tokens) > 0)
         
     start = tokens[0]
-    
-    if start=="exit" or start=="quit":
+    if start == "exit" or start == "quit":
         Quit()
     elif is_int(start):
         return (Num(int(start)), tokens[1:])
@@ -84,56 +85,29 @@ def parse_tokens(tokens):
         return (Stmt(varname, child), tokens)
     elif is_string(start):
         return (StringLiteral(start[1:-1]), tokens[1:])
-    elif start=="import":
+    elif start == "import":
         check(len(tokens)>0)
         (modulename, tokens) = parse_tokens(tokens[1:])
         return (Import(modulename.getName()), tokens) 
+    elif start == "call":
+        check(len(tokens)>0)
+        expect(tokens[1], "(")
+        (object, tokens) = parse_tokens(tokens[2:])
+        check(isinstance(object, Name))
+        check(len(tokens)>1)
+        (method, tokens) = parse_tokens(tokens[0:])
+        check(isinstance(method, Name))
+        check(len(tokens)>0)
+        args = []
+        while(tokens[0] != ")"):
+            (arg, tokens) = parse_tokens(tokens[0:])
+            args.append(arg)
+            check(len(tokens)>0)
+        return (Call(object, method, args), tokens[1:])        
     elif start=="new":
         check(len(tokens)>0)
         return (Object(tokens[1]), tokens[2:])
     else:
         check(re.match(r'^[A-Za-z0-9_]+$', start), "Variable names must contain alphanumeric characters or underscores only")
         return ( Name(start), tokens[1:] )
-         
- 
-# Testing code
-if __name__ == "__main__":
-    # First try some things that should work
-    cmds = [" + ( 3 ) ( 12 ) ",
-            " - ( 5 ) ( 2 )",
-            " + ( 15 ) ( - ( 3 ) ( 8 ) ) ",
-            "set foo = 38",
-            "foo",
-            "set bar = + ( 22 ) ( foo )",
-            "bar"]
-            
-    answers = [ 15,
-                3,
-                10,
-                None,
-                38,
-                None,
-                60 ]
-    
-    for i in range(0, len(cmds)):
-        root = parse(cmds[i])
-        result = root.eval()
-        check(result == answers[i], "TEST FAILED for cmd " + cmds[i] + 
-            ";  result was " + str(result) + " instead of " + str(answers[i]))
-    
-    # Testing for all errors is beyond our scope,
-    # but we check a few
-    bad_cmds = [ " ",
-                 "not-alpha",
-                 " + ( nope ) ( 3 ) ",
-                 " 3 + 3 ",
-                 " + ( 5 ) ( 4 ) foo ",
-                 " + ( set x = 6 ) ( 7 )" ]
-        
-    for c in bad_cmds:
-        try:
-            root = parse(c)
-            result = root.eval()
-            check(False, "Did not catch an error that we should have caught")
-        except ValueError:
-            pass
+
