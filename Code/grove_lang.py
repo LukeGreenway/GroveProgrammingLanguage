@@ -1,7 +1,7 @@
+# Luke Greenway and Tirzah Lloyd
 import importlib
 from statistics import multimode
 import sys
-import traceback
 
 
 class GroveError(Exception):
@@ -33,28 +33,19 @@ class Addition(Expr):
     def __init__(self, child1, child2):
         self.child1 = child1
         self.child2 = child2
-        if(type(self.child1.eval()) != type(self.child2.eval())):
-            raise GroveError("Types of " + str(type(self.child1)) + " and " + str(type(self.child2)) + " do not match")
-        
         if not isinstance(self.child1, Expr):
             raise GroveError("Expected expression but recieved " + str(type(self.child1)))
         if not isinstance(self.child2, Expr):
             raise GroveError("Expected expression but recieved " + str(type(self.child2)))
+        
+
+        
     def eval(self):
-        return self.child1.eval() + self.child2.eval()
-        
-        
-# class Subtraction(Expr):
-#     def __init__(self, child1, child2):
-#         self.child1 = child1
-#         self.child2 = child2
-#         if not isinstance(self.child1, Expr):
-#             raise ValueError("Grove: expected expression but recieved " + str(type(self.child1)))
-#         if not isinstance(self.child2, Expr):
-#             raise ValueError("Grove: expected expression but recieved " + str(type(self.child2)))
-#     def eval(self):
-#         return self.child1.eval() - self.child2.eval()
-        
+        if(type(self.child1.eval()) != type(self.child2.eval())):
+            raise GroveError("Types of " + str(type(self.child1)) + " and " + str(type(self.child2)) + " do not match")
+        else:
+            return self.child1.eval() + self.child2.eval()
+                
         
 class Name(Expr):
     def __init__(self, name):
@@ -65,16 +56,16 @@ class Name(Expr):
         if self.name in var_table:
             return var_table[self.name]
         else:
-            raise ValueError("Grove: undefined variable " + self.name)
+            raise GroveError("Grove: undefined variable " + self.name)
         
 class Stmt:
     def __init__(self, varname, expr):
         self.varname = varname
         self.expr = expr
         if not isinstance(self.varname, Name):
-            raise ValueError("Grove: expected variable name but recieved " + str(type(self.varname)))
+            raise GroveError("Grove: expected variable name but recieved " + str(type(self.varname)))
         if not isinstance(self.expr, Expr):
-            raise ValueError("Grove: expected expression but recieved " + str(type(self.expr)))
+            raise GroveError("Grove: expected expression but recieved " + str(type(self.expr)))
  
     def eval(self):
         var_table[self.varname.getName()] = self.expr.eval()
