@@ -124,7 +124,6 @@ class Call(Expr):
             self.args = newArgs
             return f(*self.args)
         except Exception as e:
-            traceback.print_exc()
             raise GroveError(e)
 
  
