@@ -1,4 +1,5 @@
 #exec(open("Grove_lang.py").read())
+from ast import Pass
 import re
 from unicodedata import name
 from grove_lang import *
@@ -92,8 +93,23 @@ def parse_tokens(tokens):
         (modulename, tokens) = parse_tokens(tokens[1:])
         print("module name: " + str(modulename.name))
         return (Import(modulename.eval()), tokens)
+    elif start == "call":
+        check(len(tokens)>0)
+        expect(tokens[1], "(")
+        (object, tokens) = parse_tokens(tokens[2:])
+        check(isinstance(object, Name))
+        check(len(tokens)>1)
+        (method, tokens) = parse_tokens(tokens[0:])
+        check(isinstance(method, Name))
+        check(len(tokens)>0)
+        args = []
+        while(tokens[0] != ")"):
+            (arg, tokens) = parse_tokens(tokens[1:])
+            args.append(arg)
+        return (Call(object, method, args), tokens[1:])
+        
     else:
-        check(start.isalpha(), "Variable names must be alphabetic characters only")
+        # check(start.isalpha(), "Variable names must be alphabetic characters only")
         check(re.match(r'^[A-Za-z0-9_]+$', start), "Variable names must be alphanumeric characters underscores only")
         return ( Name(start), tokens[1:] )
  
