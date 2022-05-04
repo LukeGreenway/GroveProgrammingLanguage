@@ -74,12 +74,9 @@ def parse_tokens(tokens):
         expect(tokens[0], ")")
         if start == "+":
             return ( Addition(child1, child2), tokens[1:] )
-        # else:
-        #     return ( Subtraction(child1, child2), tokens[1:] )
     elif start=="set":
         check(len(tokens)>0)
-        # check(tokens[1].isalpha(), "Variable names must be alphabetic characters only")
-        check(re.match(r'^[A-Za-z0-9_]+$', tokens[1]), "Variable names must be alphanumeric characters underscores only")
+        check(re.match(r'^[A-Za-z0-9_]+$', tokens[1]), "Variable names must contain alphanumeric characters or underscores only")
         (varname, tokens) = parse_tokens(tokens[1:])
         check(len(tokens)>0)
         expect(tokens[0],"=")
@@ -90,17 +87,14 @@ def parse_tokens(tokens):
     elif start=="import":
         check(len(tokens)>0)
         (modulename, tokens) = parse_tokens(tokens[1:])
-        print("module name: " + str(modulename.name))
-        return (Import(modulename.eval()), tokens)
+        return (Import(modulename.getName()), tokens) 
+    elif start=="new":
+        check(len(tokens)>0)
+        return (Object(tokens[1]), tokens[2:])
     else:
-        # check(start.isalpha(), "Variable names must be alphabetic characters only")
-        check(re.match(r'^[A-Za-z0-9_]+$', start), "Variable names must be alphanumeric characters underscores only")
+        check(re.match(r'^[A-Za-z0-9_]+$', start), "Variable names must contain alphanumeric characters or underscores only")
         return ( Name(start), tokens[1:] )
- 
-    
- 
-    # TODO: parse the next part of the expression
-        
+         
  
 # Testing code
 if __name__ == "__main__":

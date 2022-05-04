@@ -88,6 +88,22 @@ class Import(Stmt):
         except Exception:
             raise GroveError("Invalid module name")
 
+class Object(Expr):
+    def __init__(self,objectname):
+        self.objectname = objectname
+    def eval(self):
+        try:
+            class_name = self.objectname
+            parts = class_name.split(".")
+            container = globals()[parts[0]]
+            if isinstance(container, dict):
+                cls = container[parts[1]]
+            else:
+                cls = getattr(container, parts[1])
+            return cls()
+        except Exception:
+            raise GroveError("Invalid object")
+
 class SimpleAssignment(Stmt):
     def __init__(self, varname,expr):
         self.varname = varname
