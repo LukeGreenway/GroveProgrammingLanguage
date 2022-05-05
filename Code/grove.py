@@ -19,5 +19,5 @@ if __name__ == "__main__":
                 print(res)
         except Exception as e:
             print("Error: " + str(e))
-            traceback.print_exc()
+            traceback.print_exc()   # take out maybe? after finishing testing
             pass
