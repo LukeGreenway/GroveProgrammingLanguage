@@ -1,2 +1,6 @@
 Code/__pycache__/grove_lang.cpython-310.pyc
 Code/__pycache__/grove_parse.cpython-310.pyc
+Code/__pycache__/grove.cpython-38.pyc
+Code/__pycache__/grove_lang.cpython-38.pyc
+Code/__pycache__/grove_parse.cpython-38.pyc
+*.pyc
