@@ -1,3 +1,4 @@
+# Luke Greenway and Tirzah Lloyd
 # Written Question:
 # Is your Grove interpreter using a static or dynamic type system? Briefly explain what aspects of
 # the interpreter make it so.
@@ -17,7 +18,12 @@ if __name__ == "__main__":
             res = root.eval()
             if not res is None:
                 print(res)
+          
+        except GroveError as e:
+            print(e)
+            
         except Exception as e:
             print("Error: " + str(e))
-            traceback.print_exc()   # take out maybe? after finishing testing
+            traceback.print_exc()
             pass
+
